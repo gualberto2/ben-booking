@@ -1,3 +1,5 @@
+import Sidebar from "@/components/dashboard/sidebar";
+
 export default function DashLayout({
   children,
 }: Readonly<{
@@ -8,7 +10,8 @@ export default function DashLayout({
       <header className="flex-shrink-0"></header>
 
       <section className="flex flex-1 flex-row overflow-hidden">
-        <div className="w-full">{children}</div>
+        <Sidebar />
+        <div className="w-full p-6">{children}</div>
       </section>
 
       <footer className="flex-shrink-0"></footer>
