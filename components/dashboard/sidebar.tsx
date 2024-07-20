@@ -76,3 +76,6 @@ const Sidebar = () => {
   );
 };
 export default Sidebar;
+
+// https://jotai.org/docs/recipes/atom-with-toggle-and-storage
+// will use jotai to manage collapsed state, toggle sidebar state
