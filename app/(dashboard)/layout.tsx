@@ -1,3 +1,4 @@
+import MobileNav from "@/components/dashboard/mobile-navbar";
 import Sidebar from "@/components/dashboard/sidebar";
 
 export default function DashLayout({
@@ -7,7 +8,9 @@ export default function DashLayout({
 }>) {
   return (
     <main className="flex h-screen flex-col">
-      <header className="flex-shrink-0"></header>
+      <header className="flex-shrink-0">
+        <MobileNav />
+      </header>
 
       <section className="flex flex-1 flex-row overflow-hidden">
         <Sidebar />
