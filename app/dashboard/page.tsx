@@ -14,9 +14,9 @@ const Dashboard = async () => {
   }
 
   return (
-    <div>
-      <div>thisis te dashboard</div>
-    </div>
+    <section>
+      <div></div>
+    </section>
   );
 };
 export default Dashboard;
