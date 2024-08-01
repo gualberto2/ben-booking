@@ -1,9 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { ChevronRightIcon, Home } from "lucide-react";
 import { Button } from "../ui/button";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 import Link from "next/link";
 
