@@ -1,13 +1,11 @@
-import AddressAutoCompleteInput from "./components/map";
+import BookingForm from "./components/booking-form";
 
 const CreateBooking = () => {
   return (
     <section>
       <div>
-        <AddressAutoCompleteInput
-          onAddressSelect={handleAddressSelect}
-          selectedAddress={mySpotStore.data.address}
-        />
+        <BookingForm />
+        {/* <SpotAddress /> */}
       </div>
     </section>
   );
