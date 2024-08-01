@@ -30,7 +30,8 @@ function AddressAutoCompleteInput({
       const gAutoComplete = new google.maps.places.Autocomplete(
         placesAutoCompleteRef.current as HTMLInputElement,
         {
-          fields: ["formatted_address", "geometry", "name"],
+          fields: ["address_components", "name"],
+          types: ["address"],
           componentRestrictions: {
             country: ["us"],
           },
