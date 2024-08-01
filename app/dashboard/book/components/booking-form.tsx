@@ -251,7 +251,7 @@ const BookingForm = () => {
           name="serviceDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Day of service</FormLabel>
+              <FormLabel>Frequency</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
