@@ -14,7 +14,7 @@ export default function DashLayout({
 
       <section className="flex flex-1 flex-row overflow-hidden">
         <Sidebar />
-        <div className="w-full p-3 md:p-6">{children}</div>
+        <div className="w-full p-3 md:p-6 overflow-y-scroll">{children}</div>
       </section>
 
       <footer className="flex-shrink-0"></footer>
