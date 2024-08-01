@@ -4,11 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { libs } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-
-type LatLng = {
-  lat: number;
-  lng: number;
-};
+import { LatLng } from "@/types";
 
 type AddressAutoCompleteInputProps = {
   onAddressSelect: (address: string, gpscoords: LatLng) => void;
@@ -23,7 +19,6 @@ function AddressAutoCompleteInput({
     useState<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useJsApiLoader({
-    nonce: "477d4456-f7b5-45e2-8945-5f17b3964752",
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
     libraries: libs,
   });
