@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { ChevronRightIcon, Home } from "lucide-react";
+import { Book, ChevronRightIcon, Home } from "lucide-react";
 import { Button } from "../ui/button";
 
 import Link from "next/link";
@@ -49,6 +49,16 @@ const Sidebar = () => {
                 }`}
               >
                 Home
+              </span>
+            </Button>
+            <Button variant="ghost" className="flex flex-row gap-2">
+              <Book />
+              <span
+                className={`text-sm font-semibold ${
+                  isCollapsed ? "hidden" : "block"
+                }`}
+              >
+                Book
               </span>
             </Button>
           </div>
