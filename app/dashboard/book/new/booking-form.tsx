@@ -20,34 +20,29 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
+import { getTeams } from "@/app/db/queries";
 
-const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
-] as const;
+type TeamOption = {
+  value: number;
+  label: string;
+};
 
 const phoneRegex = new RegExp(
   /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
@@ -57,18 +52,33 @@ const formSchema = z.object({
   name: z.string().min(2).max(50),
   email: z.string().min(2).max(50),
   number: z.string().regex(phoneRegex, "Invalid Number!"),
-  serviceLocation: z.string().min(3).max(200),
+  serviceLocation: z.string().min(3).max(300),
   serviceDate: z.date({ required_error: "A service date must be selected" }),
   serviceTime: z.string(),
   assignedTeam: z.string(),
 });
 
 const BookingForm = () => {
+  const [teams, setTeams] = useState<TeamOption[]>([]);
+
+  useEffect(() => {
+    async function fetchTeams() {
+      const fetchedTeams = await getTeams();
+      setTeams(
+        fetchedTeams.map((team) => ({
+          value: team.id,
+          label: team.team_name,
+        }))
+      );
+    }
+    fetchTeams();
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  const handleAddressChange = (newAddress: any) => {
+  const handleAddressChange = (newAddress: string) => {
     form.setValue("serviceLocation", newAddress);
   };
 
@@ -80,35 +90,44 @@ const BookingForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormDescription>Clients first and last name</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="john@email.com" {...field} type="email" />
-              </FormControl>
-              <FormDescription>Clients preferred email address</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+        <div className="flex w-full items-center gap-5 flex-col md:flex-row">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="John Doe" className="w-full" {...field} />
+                </FormControl>
+                <FormDescription>Clients first and last name</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="john@email.com"
+                    className="w-full"
+                    {...field}
+                    type="email"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Clients preferred email address
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
           control={form.control}
           name="number"
@@ -127,61 +146,39 @@ const BookingForm = () => {
           control={form.control}
           name="assignedTeam"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone Number</FormLabel>
-              <FormControl>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
+            <FormItem className="w-[240px] flex flex-col">
+              <FormLabel>Team</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a team" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem
+                      value={team.label}
+                      key={team.value}
+                      onSelect={() => {
+                        form.setValue("assignedTeam", team.value.toString());
+                      }}
+                      className="flex flex-row items-center"
+                    >
+                      <Check
                         className={cn(
-                          "w-[200px] justify-between",
-                          !field.value && "text-muted-foreground"
+                          "mr-2 h-4 w-4",
+                          team.value.toString() === field.value
+                            ? "opacity-100"
+                            : "opacity-0"
                         )}
-                      >
-                        {field.value
-                          ? languages.find(
-                              (language) => language.value === field.value
-                            )?.label
-                          : "Select Team"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search teams..." />
-                      <CommandList>
-                        <CommandEmpty>No team found.</CommandEmpty>
-                        <CommandGroup>
-                          {languages.map((language) => (
-                            <CommandItem
-                              value={language.label}
-                              key={language.value}
-                              onSelect={() => {
-                                form.setValue("assignedTeam", language.value);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  language.value === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {language.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </FormControl>
-              <FormDescription>Clients primary phone number</FormDescription>
+                      />
+                      {team.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <FormDescription>Choose a team for the cleaning</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -246,9 +243,9 @@ const BookingForm = () => {
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
-          name="serviceDate"
+          name="frequencyOfService"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Frequency</FormLabel>
@@ -287,7 +284,7 @@ const BookingForm = () => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name="serviceTime"
@@ -302,20 +299,7 @@ const BookingForm = () => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="assignedTeam"
-          render={({ field }) => (
-            <FormItem className="w-[240px]">
-              <FormLabel>Time for service</FormLabel>
-              <FormControl>
-                <Input {...field} type="time" />
-              </FormControl>
-              <FormDescription>Specified time for cleaning,</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
         <Button type="submit">Submit</Button>
       </form>
     </Form>
